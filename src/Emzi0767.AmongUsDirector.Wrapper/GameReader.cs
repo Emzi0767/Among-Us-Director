@@ -127,7 +127,7 @@ namespace Emzi0767.AmongUsDirector
                 if (inMeeting && this.MeetingStarted != null)
                     this.MeetingStarted(null, new MeetingStartEventArgs());
                 else if (!inMeeting && this.MeetingEnded != null)
-                    this.MeetingEnded(null, new MeetingEndEventArgs(timer + 2.5F));
+                    this.MeetingEnded(null, new MeetingEndEventArgs(timer + 3.0F));
             }
         }
 
@@ -148,8 +148,8 @@ namespace Emzi0767.AmongUsDirector
             client = this._mem.Read<RawClient>(clientPtr);
             this.ValidateKlass(client.Klass, Offsets.ClientName);
 
-            return client.GameMode == GameMode.FreePlay && client.GameState == GameState.Joined ||
-                client.GameMode != GameMode.FreePlay && client.GameState == GameState.Started;
+            return client.GameMode == GameMode.FreePlay && client.GameState == GameState.Joined
+                || client.GameMode != GameMode.FreePlay && client.GameState == GameState.Started;
         }
 
         private HashSet<Player> ReadPlayers()
