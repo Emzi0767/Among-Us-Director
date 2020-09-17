@@ -1,6 +1,6 @@
 # Among Us Director
-A Discord toolkit for managing Among Us games. Primarly aimed at Discord, specifically muting people outside of 
-meetings, and muting during meetings.
+A toolkit for managing Among Us games. Primarly aimed at Discord, specifically muting people outside of meetings, and 
+muting during meetings.
 
 ## Credit
 [@Niewiarowski](https://github.com/Niewiarowski) - for initial idea, and guidance to make this project happen
