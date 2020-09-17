@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C30E2A9B-74B0-4C25-813D-526525293238}"
+	ProjectSection(SolutionItems) = preProject
+		src\Emzi0767.AmongUsDirector.Common.targets = src\Emzi0767.AmongUsDirector.Common.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{173CE84F-D568-4072-87FA-E01D33E073FC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emzi0767.AmongUsDirector.Wrapper", "src\Emzi0767.AmongUsDirector.Wrapper\Emzi0767.AmongUsDirector.Wrapper.csproj", "{0C4BA244-7417-46FA-8250-D2A61FBCB1CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emzi0767.AmongUsDirector.Bot", "src\Emzi0767.AmongUsDirector.Bot\Emzi0767.AmongUsDirector.Bot.csproj", "{1B25A24F-FDDF-4CE5-A280-FD1046E7D361}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emzi0767.AmongUsDirector.TestApp", "tests\Emzi0767.AmongUsDirector.TestApp\Emzi0767.AmongUsDirector.TestApp.csproj", "{8DD873FA-2078-44B9-969C-27AAF772ACEA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "meta", "meta", "{37C87576-E724-45D2-863D-95CE4518D3AB}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.TXT = LICENSE.TXT
+		NOTICE.TXT = NOTICE.TXT
+		README.MD = README.MD
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C4BA244-7417-46FA-8250-D2A61FBCB1CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C4BA244-7417-46FA-8250-D2A61FBCB1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C4BA244-7417-46FA-8250-D2A61FBCB1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C4BA244-7417-46FA-8250-D2A61FBCB1CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B25A24F-FDDF-4CE5-A280-FD1046E7D361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B25A24F-FDDF-4CE5-A280-FD1046E7D361}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B25A24F-FDDF-4CE5-A280-FD1046E7D361}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B25A24F-FDDF-4CE5-A280-FD1046E7D361}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DD873FA-2078-44B9-969C-27AAF772ACEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DD873FA-2078-44B9-969C-27AAF772ACEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DD873FA-2078-44B9-969C-27AAF772ACEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DD873FA-2078-44B9-969C-27AAF772ACEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0C4BA244-7417-46FA-8250-D2A61FBCB1CF} = {C30E2A9B-74B0-4C25-813D-526525293238}
+		{1B25A24F-FDDF-4CE5-A280-FD1046E7D361} = {C30E2A9B-74B0-4C25-813D-526525293238}
+		{8DD873FA-2078-44B9-969C-27AAF772ACEA} = {173CE84F-D568-4072-87FA-E01D33E073FC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B0BBEEC-8417-4E76-9847-C5CFF54831AC}
+	EndGlobalSection
+EndGlobal
