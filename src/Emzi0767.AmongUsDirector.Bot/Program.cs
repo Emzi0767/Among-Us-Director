@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Emzi0767.AmongUsDirector.Bot
+namespace Emzi0767.AmongUsDirector
 {
     class Program
     {

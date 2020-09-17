@@ -27,6 +27,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00722" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00722" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../src/Emzi0767.AmongUsDirector.Wrapper/Emzi0767.AmongUsDirector.Wrapper.csproj" />
   </ItemGroup>
 
