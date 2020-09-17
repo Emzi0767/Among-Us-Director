@@ -44,7 +44,7 @@ namespace Emzi0767.AmongUsDirector
         public GameMode GameMode;
     }
 
-    public enum GameState : int
+    internal enum GameState : int
     { 
         NotJoined = 0,
         Joined = 1,
@@ -52,14 +52,14 @@ namespace Emzi0767.AmongUsDirector
         Ended = 3
     }
 
-    public enum MatchMakerMode : int
+    internal enum MatchMakerMode : int
     {
         None = 0,
         Client = 1,
         HostClient = 2
     }
 
-    public enum GameMode : int
+    internal enum GameMode : int
     {
         LocalGame = 0,
         OnlineGame = 1,

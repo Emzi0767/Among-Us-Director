@@ -22,6 +22,6 @@ namespace Emzi0767.AmongUsDirector
     {
         public bool HasStarted { get; set; } = false;
         public bool IsInMeeting { get; set; } = false;
-        public HashSet<Player> Players { get; set; } = null;
+        public HashSet<Player> Players { get; set; } = new HashSet<Player>();
     }
 }

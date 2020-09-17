@@ -14,23 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Emzi0767.AmongUsDirector
 {
     /// <summary>
-    /// Indicates the game has started.
+    /// Defines the map that is being played.
     /// </summary>
-    public sealed class MeetingEndEventArgs : EventArgs
+    public enum GameMap : int
     {
         /// <summary>
-        /// Gets the amount of seconds the exile screen lasts.
+        /// Defines that The Skeld map is active.
         /// </summary>
-        public float ExileDuration { get; }
+        Skeld = 0,
 
-        internal MeetingEndEventArgs(float exileTimer)
-        {
-            this.ExileDuration = exileTimer;
-        }
+        /// <summary>
+        /// Defines that Mira HQ map is active.
+        /// </summary>
+        MiraHq = 1,
+
+        /// <summary>
+        /// Defines that Pollus map is active.
+        /// </summary>
+        Pollus = 2
     }
 }

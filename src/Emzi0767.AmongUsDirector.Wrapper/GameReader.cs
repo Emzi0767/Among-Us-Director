@@ -37,13 +37,15 @@ namespace Emzi0767.AmongUsDirector
 
         public void DoRead()
         {
+            var (timer, map) = this.ReadMapAndExileTimer();
+
             if (!this.ReadStartedStatus(out var client))
             {
                 if (this._state.HasStarted)
                 {
                     this._state.HasStarted = false;
                     this._state.IsInMeeting = false;
-                    this._state.Players = null;
+                    this._state.Players.Clear();
 
                     if (this.GameEnded != null)
                         this.GameEnded(null, new GameEndEventArgs());
@@ -55,10 +57,11 @@ namespace Emzi0767.AmongUsDirector
                 {
                     this._state.HasStarted = true;
                     this._state.IsInMeeting = false;
-                    this._state.Players = new HashSet<Player>();
+
+                    (_, map) = this.ReadMapAndExileTimer();
 
                     if (this.GameStarted != null)
-                        this.GameStarted(null, new GameStartEventArgs());
+                        this.GameStarted(null, new GameStartEventArgs(map));
 
                     Thread.Sleep(500); // big brain workarounds
                 }
@@ -101,14 +104,20 @@ namespace Emzi0767.AmongUsDirector
 
             if (players.Count != 0) // logically, this can never be true - if you're in a game, there's at least one player in
             {
+                var flagged = new List<Player>(this._state.Players.Count);
                 foreach (var player in this._state.Players)
                 {
                     if (!players.Contains(player))
                     {
+                        flagged.Add(player);
+
                         if (this.PlayerLeft != null)
                             this.PlayerLeft(null, new PlayerLeaveEventArgs(player));
                     }
                 }
+
+                foreach (var fplayer in flagged)
+                    this._state.Players.Remove(fplayer);
             }
 
             var inMeeting = this.ReadMeetingStatus();
@@ -119,7 +128,7 @@ namespace Emzi0767.AmongUsDirector
                 if (inMeeting && this.MeetingStarted != null)
                     this.MeetingStarted(null, new MeetingStartEventArgs());
                 else if (!inMeeting && this.MeetingEnded != null)
-                    this.MeetingEnded(null, new MeetingEndEventArgs());
+                    this.MeetingEnded(null, new MeetingEndEventArgs(timer + 2.5F));
             }
         }
 
@@ -156,14 +165,18 @@ namespace Emzi0767.AmongUsDirector
             var arrayBase = playerList.Fields;
             for (var i = 0; i < playerCount; i++)
             {
-                var playerPtr = this._mem.ReadPointer(arrayBase + Offsets.ArrayFirst + i * IntPtr.Size);
-                var player = this._mem.Read<RawPlayerInfo>(playerPtr);
-                var playerNameStruct = this._mem.Read<RawString>(player.Name);
-                var playerName = this._mem.ReadString(player.Name + Offsets.StringFirst, playerNameStruct.Length);
-                if (string.IsNullOrWhiteSpace(playerName))
-                    continue;
+                try
+                {
+                    var playerPtr = this._mem.ReadPointer(arrayBase + Offsets.ArrayFirst + i * IntPtr.Size);
+                    var player = this._mem.Read<RawPlayerInfo>(playerPtr);
+                    var playerNameStruct = this._mem.Read<RawString>(player.Name);
+                    var playerName = this._mem.ReadString(player.Name + Offsets.StringFirst, playerNameStruct.Length);
+                    if (string.IsNullOrWhiteSpace(playerName))
+                        continue;
 
-                players.Add(new Player(player.Id, playerName, player.Dead, player.Impostor));
+                    players.Add(new Player(player.Id, playerName, player.Dead, player.Impostor));
+                }
+                catch { /* Occasionally a player leaves between cycles, that can lead to memory read errors. */ }
             }
 
             return players;
@@ -171,14 +184,46 @@ namespace Emzi0767.AmongUsDirector
 
         private bool ReadMeetingStatus()
         {
-            var meetingHudPtr = this._mem.ReadPointerChain(this._module, Offsets.MeetingHudBase, Offsets.Il2CppStaticsOffset, Offsets.None);
+            var meetingHudPtr = this._mem.ReadPointer(this._module + Offsets.MeetingHudBase);
+            if (meetingHudPtr == IntPtr.Zero)
+                return false;
+
+            meetingHudPtr = this._mem.ReadPointerChain(meetingHudPtr, Offsets.Il2CppStaticsOffset, Offsets.None);
+            if (meetingHudPtr == IntPtr.Zero)
+                return false;
+
             var meetingHud = this._mem.Read<RawMeetingHud>(meetingHudPtr);
             this.ValidateKlass(meetingHud.Klass, Offsets.MeetingHudName);
 
             return meetingHud.MeetingState != MeetingState.Proceeding;
         }
 
-        private void ValidateKlass(IntPtrEx klassPtr, string refName)
+        private (float, GameMap) ReadMapAndExileTimer()
+        {
+            var timer = float.NaN;
+            var map = (GameMap)(-1);
+
+            var shipStatusPtr = this._mem.ReadPointer(this._module + Offsets.ShipStatusBase);
+            if (shipStatusPtr.Pointer == IntPtr.Zero)
+                return (timer, map);
+
+            shipStatusPtr = this._mem.ReadPointerChain(shipStatusPtr, Offsets.Il2CppStaticsOffset, Offsets.None);
+
+            var shipStatus = this._mem.Read<RawShipStatus>(shipStatusPtr);
+            this.ValidateKlass(shipStatus.Klass, Offsets.ShipStatusName);
+
+            map = (GameMap)shipStatus.MapType;
+            if (shipStatus.ExileController == IntPtr.Zero)
+                return (timer, map);
+
+            var exileController = this._mem.Read<RawExileController>(shipStatus.ExileController);
+            this.ValidateKlass(exileController.Klass, Offsets.ExileControllerName, Offsets.MiraExileControllerName, Offsets.PollusExileControllerName);
+
+            timer = exileController.Duration;
+            return (timer, map);
+        }
+
+        private void ValidateKlass(IntPtrEx klassPtr, params string[] refNames)
         {
             // For whatever bloody reason, the pointers are off by one sometimes.
             // Always case with LSB
@@ -187,7 +232,8 @@ namespace Emzi0767.AmongUsDirector
                 ptrv &= ~0x1;
 
             var klass = this._mem.Read<RawClassInfo>(new IntPtr(ptrv));
-            if (this._mem.ReadAnsiString(klass.Name) != refName)
+            var name = this._mem.ReadAnsiString(klass.Name);
+            if (!refNames.Any(x => name == x))
                 throw new InvalidProcessException();
         }
     }

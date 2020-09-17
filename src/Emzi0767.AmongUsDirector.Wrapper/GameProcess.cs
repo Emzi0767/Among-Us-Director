@@ -44,6 +44,8 @@ namespace Emzi0767.AmongUsDirector
             this._module = gameModule;
             this._cts = new CancellationTokenSource();
             this._ct = this._cts.Token;
+
+            this._proc.Exited += this._proc_Exited;
         }
 
         /// <summary>
@@ -63,7 +65,11 @@ namespace Emzi0767.AmongUsDirector
         {
             this._cts.Cancel();
             this._cts.Dispose();
-            this._eventDispatcherThread.Join();
+            try
+            {
+                this._eventDispatcherThread.Join();
+            }
+            catch { }
         }
 
         /// <summary>
@@ -164,6 +170,11 @@ namespace Emzi0767.AmongUsDirector
                 reader.DoRead();
                 Thread.Yield();
             }
+        }
+
+        private void _proc_Exited(object sender, EventArgs e)
+        {
+            this.Dispose();
         }
 
         /// <summary>

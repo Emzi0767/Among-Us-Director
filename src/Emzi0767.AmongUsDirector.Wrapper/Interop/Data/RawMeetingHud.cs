@@ -32,7 +32,7 @@ namespace Emzi0767.AmongUsDirector
         public float MeetingTimer;
     }
 
-    public enum MeetingState : int
+    internal enum MeetingState : int
     {
         Discussion = 0,
         NotVoted = 1,

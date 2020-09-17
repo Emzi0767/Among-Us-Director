@@ -32,5 +32,12 @@ namespace Emzi0767.AmongUsDirector
 
         public const string GameDataName = "GameData";
         public const int GameDataBase = 0xDA5A60;
+
+        public const string ShipStatusName = "ShipStatus";
+        public const int ShipStatusBase = 0xDA5A50;
+
+        public const string ExileControllerName = "ExileController";
+        public const string MiraExileControllerName = "MiraExileController";
+        public const string PollusExileControllerName = "PbExileController";
     }
 }

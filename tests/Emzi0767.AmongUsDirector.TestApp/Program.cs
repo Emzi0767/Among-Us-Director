@@ -25,7 +25,7 @@ namespace Emzi0767.AmongUsDirector
             var proc = GameProcess.Attach();
             Console.WriteLine("Attached to process");
 
-            proc.GameStarted += (o, e) => Console.WriteLine("EV: GAME_START");
+            proc.GameStarted += (o, e) => Console.WriteLine("EV: GAME_START -> map: {0}", e.Map);
             proc.GameEnded += (o, e) => Console.WriteLine("EV: GAME_END");
 
             proc.PlayerJoined += (o, e) => Console.WriteLine("EV: PLAYER_JOIN -> {0}", e.Player.Name);
@@ -34,7 +34,7 @@ namespace Emzi0767.AmongUsDirector
             proc.PlayerImpostorStatusChanged += (o, e) => Console.WriteLine("EV: PLAYER_IMPOSTOR_STATUS_CHANGE -> {0}, {1}", e.Player.Name, e.Player.IsImpostor);
 
             proc.MeetingStarted += (o, e) => Console.WriteLine("EV: MEETING_START");
-            proc.MeetingEnded += (o, e) => Console.WriteLine("EV: MEETING_END");
+            proc.MeetingEnded += (o, e) => Console.WriteLine("EV: MEETING_END -> exile: {0:0.0}s", e.ExileDuration);
 
             proc.Start();
             Console.WriteLine("Loop running");

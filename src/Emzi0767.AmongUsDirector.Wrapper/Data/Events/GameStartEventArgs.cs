@@ -23,7 +23,14 @@ namespace Emzi0767.AmongUsDirector
     /// </summary>
     public sealed class GameStartEventArgs : EventArgs
     {
-        internal GameStartEventArgs()
-        { }
+        /// <summary>
+        /// Gets the map being played.
+        /// </summary>
+        public GameMap Map { get; }
+
+        internal GameStartEventArgs(GameMap map)
+        {
+            this.Map = map;
+        }
     }
 }

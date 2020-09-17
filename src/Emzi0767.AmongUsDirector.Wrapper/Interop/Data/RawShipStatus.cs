@@ -15,22 +15,27 @@
 // limitations under the License.
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace Emzi0767.AmongUsDirector
 {
-    /// <summary>
-    /// Indicates the game has started.
-    /// </summary>
-    public sealed class MeetingEndEventArgs : EventArgs
+    [StructLayout(LayoutKind.Explicit)]
+    internal struct RawShipStatus
     {
-        /// <summary>
-        /// Gets the amount of seconds the exile screen lasts.
-        /// </summary>
-        public float ExileDuration { get; }
+        [FieldOffset(0x00)]
+        public IntPtr Klass;
 
-        internal MeetingEndEventArgs(float exileTimer)
-        {
-            this.ExileDuration = exileTimer;
-        }
+        [FieldOffset(0x44)]
+        public IntPtr ExileController;
+
+        [FieldOffset(0xD4)]
+        public MapType MapType;
+    }
+
+    internal enum MapType : int
+    {
+        Skeld = 0,
+        MiraHq = 1,
+        Pollus = 2
     }
 }
