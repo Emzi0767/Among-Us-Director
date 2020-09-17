@@ -58,6 +58,7 @@ namespace Emzi0767.AmongUsDirector
                     this._state.HasStarted = true;
                     this._state.IsInMeeting = false;
 
+                    Thread.Sleep(100);
                     (_, map) = this.ReadMapAndExileTimer();
 
                     if (this.GameStarted != null)
