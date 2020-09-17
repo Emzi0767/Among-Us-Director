@@ -3,7 +3,7 @@ A Discord toolkit for managing Among Us games. Primarly aimed at Discord, specif
 meetings, and muting during meetings.
 
 ## Credit
-@Niewiarowski - for initial idea, and guidance to make this project happen
+[@Niewiarowski](https://github.com/Niewiarowski) - for initial idea, and guidance to make this project happen
 
 ## Usage
 ### The library
