@@ -58,13 +58,11 @@ namespace Emzi0767.AmongUsDirector
                     this._state.HasStarted = true;
                     this._state.IsInMeeting = false;
 
-                    Thread.Sleep(100);
+                    Thread.Sleep(500); // What the actual fuck kind of an object takes more than 300ms to initialize
                     (_, map) = this.ReadMapAndExileTimer();
 
                     if (this.GameStarted != null)
                         this.GameStarted(null, new GameStartEventArgs(map));
-
-                    Thread.Sleep(500); // big brain workarounds
                 }
             }
 
@@ -202,7 +200,7 @@ namespace Emzi0767.AmongUsDirector
         private (float, GameMap) ReadMapAndExileTimer()
         {
             var timer = float.NaN;
-            var map = (GameMap)(-1);
+            var map = GameMap.Unknown;
 
             var shipStatusPtr = this._mem.ReadPointer(this._module + Offsets.ShipStatusBase);
             if (shipStatusPtr.Pointer == IntPtr.Zero)

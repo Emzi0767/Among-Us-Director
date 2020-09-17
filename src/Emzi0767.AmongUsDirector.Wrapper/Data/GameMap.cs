@@ -34,6 +34,11 @@ namespace Emzi0767.AmongUsDirector
         /// <summary>
         /// Defines that Pollus map is active.
         /// </summary>
-        Pollus = 2
+        Pollus = 2,
+
+        /// <summary>
+        /// Defines that unknown map is active.
+        /// </summary>
+        Unknown = -1
     }
 }
