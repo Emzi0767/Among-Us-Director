@@ -207,6 +207,8 @@ namespace Emzi0767.AmongUsDirector
                 return (timer, map);
 
             shipStatusPtr = this._mem.ReadPointerChain(shipStatusPtr, Offsets.Il2CppStaticsOffset, Offsets.None);
+            if (shipStatusPtr.Pointer == IntPtr.Zero)
+                return (timer, map);
 
             var shipStatus = this._mem.Read<RawShipStatus>(shipStatusPtr);
             this.ValidateKlass(shipStatus.Klass, Offsets.ShipStatusName);
