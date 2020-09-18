@@ -14,22 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
-
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class BotConfiguration
+    public struct MemberPlayerMapping
     {
-        [Required]
-        public string Token { get; set; }
+        public ulong MemberId { get; }
 
-        [Required]
-        public string Prefix { get; set; }
+        public string PlayerName { get; }
 
-        [Required]
-        public int DiscoveryPort { get; set; }
-
-        [Required]
-        public RedisConfiguration Redis { get; set; }
+        public MemberPlayerMapping(ulong memberId, string player)
+        {
+            this.MemberId = memberId;
+            this.PlayerName = player;
+        }
     }
 }

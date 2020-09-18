@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -27,10 +28,12 @@ namespace Emzi0767.AmongUsDirector
     public sealed class GameCommandModule : BaseCommandModule
     {
         private GameManagerService GameManager { get; }
+        private EmojiProvider EmojiProvider { get; }
 
-        public GameCommandModule(GameManagerService gameManager)
+        public GameCommandModule(GameManagerService gameManager, EmojiProvider emojiProvider)
         {
             this.GameManager = gameManager;
+            this.EmojiProvider = emojiProvider;
         }
 
         [Command("claim")]
@@ -40,27 +43,25 @@ namespace Emzi0767.AmongUsDirector
         {
             if (string.IsNullOrWhiteSpace(playerName))
             {
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msraisedhand:"));
+                await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.RaisedHand));
                 return;
             }
 
-            this.GameManager.Associate(ctx.Member.Id, playerName);
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
+            await this.GameManager.AssociateAsync(ctx.Member.Id, playerName);
+            await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.OkHand));
         }
 
         [Command("unclaim")]
         [Description("Unclaims a player.")]
-        public async Task UnclaimAsync(CommandContext ctx,
-            [Description("Player name to unclaim."), RemainingText] string playerName)
+        public async Task UnclaimAsync(CommandContext ctx)
         {
-            if (string.IsNullOrWhiteSpace(playerName))
+            if (!await this.GameManager.UnassociateAsync(ctx.Member.Id))
             {
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msraisedhand:"));
+                await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.RaisedHand));
                 return;
             }
 
-            this.GameManager.Associate(0, playerName);
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
+            await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.OkHand));
         }
 
         [Command("associate"), Aliases("assoc")]
@@ -72,29 +73,37 @@ namespace Emzi0767.AmongUsDirector
         {
             if (string.IsNullOrWhiteSpace(playerName))
             {
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msraisedhand:"));
+                await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.RaisedHand));
                 return;
             }
 
-            this.GameManager.Associate(member.Id, playerName);
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
+            await this.GameManager.AssociateAsync(member.Id, playerName);
+            await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.OkHand));
         }
 
         [Command("unassociate"), Aliases("unassoc", "disassociate", "disassoc")]
         [Description("Disassociates a discord member with a player.")]
         [RequireUserPermissions(Permissions.ManageRoles)]
         public async Task UnassociateAsync(CommandContext ctx,
-            [Description("Discord user to disassociate.")] DiscordMember member,
-            [Description("Player to disassociate with."), RemainingText] string playerName)
+            [Description("Discord user to disassociate."), RemainingText] DiscordMember member)
         {
-            if (string.IsNullOrWhiteSpace(playerName))
+            if (!await this.GameManager.UnassociateAsync(member.Id))
             {
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msraisedhand:"));
+                await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.RaisedHand));
                 return;
             }
 
-            this.GameManager.Associate(0, playerName);
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
+            await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.OkHand));
+        }
+
+        [Command("whoami"), Aliases("name")]
+        [Description("Displays your current player name.")]
+        public async Task WhoAmIAsync(CommandContext ctx)
+        {
+            var player = this.GameManager.GetAssociation(ctx.Member.Id);
+            await ctx.Channel.SendMessageAsync(player != null
+                ? $"Your player name: {player}"
+                : "You did not yet associate a player name with your Discord account. Check out `claim` command.", mentions: Array.Empty<IMention>());
         }
 
         [Command("channel"), Aliases("chn", "vc")]
@@ -103,15 +112,14 @@ namespace Emzi0767.AmongUsDirector
         public async Task SetVoiceChannelAsync(CommandContext ctx,
             [Description("Voice channel to use for the game."), RemainingText] DiscordChannel channel)
         {
-            if (channel == null || channel.Type != ChannelType.Voice)
+            if (channel.Type != ChannelType.Voice)
             {
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msraisedhand:"));
+                await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.RaisedHand));
                 return;
             }
 
-            this.GameManager.VoiceChannel = channel.Id;
-            this.GameManager.Guild = channel.Guild.Id;
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
+            await this.GameManager.SetVoiceChannelAsync(channel?.Id ?? 0ul, channel?.Guild.Id ?? 0ul);
+            await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.OkHand));
         }
 
         [Command("output")]
@@ -125,12 +133,20 @@ namespace Emzi0767.AmongUsDirector
 
             if (channel.Type != ChannelType.Text)
             {
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msraisedhand:"));
+                await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.RaisedHand));
                 return;
             }
 
-            this.GameManager.TextChannel = channel.Id;
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
+            await this.GameManager.SetOutputChannelAsync(channel?.Id ?? 0);
+            await ctx.RespondAsync(this.EmojiProvider.Get(EmojiType.OkHand));
+        }
+
+        [Command("diag")]
+        [Description("Outputs diagnostic info.")]
+        [RequireUserPermissions(Permissions.ManageChannels)]
+        public async Task DiagnosticsAsync(CommandContext ctx)
+        {
+            await ctx.RespondAsync($"Voice: {this.GameManager.VoiceChannel}\nGuild: {this.GameManager.Guild}\nOutput: {this.GameManager.TextChannel}");
         }
     }
 }

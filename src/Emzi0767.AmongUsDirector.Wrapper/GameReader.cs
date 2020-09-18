@@ -127,7 +127,7 @@ namespace Emzi0767.AmongUsDirector
                 if (inMeeting && this.MeetingStarted != null)
                     this.MeetingStarted(null, new MeetingStartEventArgs());
                 else if (!inMeeting && this.MeetingEnded != null)
-                    this.MeetingEnded(null, new MeetingEndEventArgs(timer + 3.0F));
+                    this.MeetingEnded(null, new MeetingEndEventArgs(timer + 3.5F));
             }
         }
 

@@ -50,12 +50,19 @@ namespace Emzi0767.AmongUsDirector
                 .Bind(ctx.Configuration)
                 .ValidateDataAnnotations();
 
+            services.AddOptions<RedisConfiguration>()
+                .Bind(ctx.Configuration.GetSection("Redis"))
+                .ValidateDataAnnotations();
+
             services.AddSingleton<DiscordBotService>();
             services.AddSingleton<AmongUsGame>();
             services.AddSingleton<GameManagerService>();
             services.AddSingleton<DiscoveryServer>();
             services.AddSingleton<MothershipCommArray>();
             services.AddTransient<PayloadSerializer>();
+            services.AddSingleton<RedisClientService>();
+            services.AddSingleton<UserMappingStorageService>();
+            services.AddSingleton<EmojiProvider>();
 
             services.AddHostedService<AmongUsDirectorHostedService>();
         }

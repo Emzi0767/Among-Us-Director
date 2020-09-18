@@ -14,22 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
-
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class BotConfiguration
+    public enum EmojiType : int
     {
-        [Required]
-        public string Token { get; set; }
-
-        [Required]
-        public string Prefix { get; set; }
-
-        [Required]
-        public int DiscoveryPort { get; set; }
-
-        [Required]
-        public RedisConfiguration Redis { get; set; }
+        OkHand = 0,
+        RaisedHand = 1
     }
 }

@@ -29,19 +29,22 @@ namespace Emzi0767.AmongUsDirector
         private GameManagerService GameManager { get; }
         private DiscoveryServer Discovery { get; }
         private MothershipCommArray Comms { get; }
+        private RedisClientService Redis { get; }
 
         public AmongUsDirectorHostedService(
             DiscordBotService discordBot,
             AmongUsGame game,
             GameManagerService gameManager,
             DiscoveryServer discovery,
-            MothershipCommArray comms)
+            MothershipCommArray comms,
+            RedisClientService redis)
         {
             this.DiscordBot = discordBot;
             this.Game = game;
             this.GameManager = gameManager;
             this.Discovery = discovery;
             this.Comms = comms;
+            this.Redis = redis;
 
             this.Game.GameStarted += this.Game_GameStarted;
             this.Game.GameEnded += this.Game_GameEnded;
@@ -57,10 +60,13 @@ namespace Emzi0767.AmongUsDirector
             await this.DiscordBot.StartAsync();
             this.Comms.Start();
             this.Discovery.Start();
+            await this.Redis.StartAsync();
+            await this.GameManager.StartAsync();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
+            this.Redis.Stop();
             await this.Discovery.StopAsync();
             await this.Comms.StopAsync();
             this.Game.Stop();
@@ -151,7 +157,13 @@ namespace Emzi0767.AmongUsDirector
         private async Task Game_MeetingEnded_Continuation(Task _)
         {
             if (this.GameManager.VoiceChannel != 0ul)
-                await this.DiscordBot.MuteAllAsync(this.GameManager.VoiceChannel);
+            {
+                var mute = this.GameManager.GetUnmutables();
+                var unmute = this.GameManager.GetUndeafables();
+
+                await this.DiscordBot.MuteAsync(this.GameManager.Guild, mute);
+                await this.DiscordBot.UnmuteAsync(this.GameManager.Guild, unmute);
+            }
 
             var chn = this.GameManager.TextChannel;
             if (chn == 0ul)

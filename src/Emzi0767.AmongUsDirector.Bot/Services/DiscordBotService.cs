@@ -83,6 +83,15 @@ namespace Emzi0767.AmongUsDirector
             await Task.WhenAll(tasks);
         }
 
+        public async Task MuteAsync(ulong guildId, IEnumerable<ulong> memberIds)
+        {
+            var gld = this.Discord.Guilds[guildId];
+            var tasks = memberIds.Select(x => gld.GetMemberAsync(x));
+            var mbrs = await Task.WhenAll(tasks);
+            var tasks2 = mbrs.Select(x => x.ModifyAsync(x => { x.Deafened = true; x.Muted = true; }));
+            await Task.WhenAll(tasks2);
+        }
+
         public async Task UnmuteAllAsync(ulong channelId)
         {
             var chn = await this.Discord.GetChannelAsync(channelId);
@@ -114,6 +123,12 @@ namespace Emzi0767.AmongUsDirector
             var chn = await this.Discord.GetChannelAsync(channelId);
             await chn.SendMessageAsync(message);
         }
+
+        public bool IsInGuild(ulong guild)
+            => this.Discord.Guilds.ContainsKey(guild);
+
+        public DiscordEmoji GetEmote(string name)
+            => DiscordEmoji.FromName(this.Discord, name);
 
         private Task CommandsNext_CommandErrored(CommandErrorEventArgs e)
         {
