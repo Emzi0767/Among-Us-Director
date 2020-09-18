@@ -69,7 +69,7 @@ namespace Emzi0767.AmongUsDirector
 
         public static void ConfigureLogging(ILoggingBuilder logging)
         {
-            logging.SetMinimumLevel(LogLevel.Debug);
+            logging.SetMinimumLevel(LogLevel.Information);
 
             logging.AddConsole(console =>
             {
