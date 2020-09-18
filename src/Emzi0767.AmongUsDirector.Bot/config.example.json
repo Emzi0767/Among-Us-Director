@@ -1,0 +1,12 @@
+﻿{
+  "token": "put discord bot token here",
+  "prefix": "i!",
+  "discoveryPort": 42069,
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "index": 0,
+    "password": "hunter2",
+    "useSsl": true
+  }
+}
