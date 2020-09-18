@@ -20,10 +20,11 @@
 -->
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../src/Emzi0767.AmongUsDirector.Common.targets" />
+  <Import Project="../Emzi0767.AmongUsDirector.Common.targets" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Emzi0767.AmongUsDirector.Wrapper/Emzi0767.AmongUsDirector.Wrapper.csproj" />
+    <ProjectReference Include="../Emzi0767.AmongUsDirector.Common/Emzi0767.AmongUsDirector.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

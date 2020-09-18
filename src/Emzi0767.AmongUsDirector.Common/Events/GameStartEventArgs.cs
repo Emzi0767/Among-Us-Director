@@ -14,19 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class BotConfiguration
+    /// <summary>
+    /// Indicates the game has started.
+    /// </summary>
+    public sealed class GameStartEventArgs : EventArgs
     {
-        [Required]
-        public string Token { get; set; }
+        /// <summary>
+        /// Gets the map being played.
+        /// </summary>
+        public GameMap Map { get; }
 
-        [Required]
-        public string Prefix { get; set; }
-
-        [Required]
-        public int DiscoveryPort { get; set; }
+        /// <summary>
+        /// Creates a new instance of the event args.
+        /// </summary>
+        /// <param name="map">Map on which the game happens.</param>
+        internal GameStartEventArgs(GameMap map)
+        {
+            this.Map = map;
+        }
     }
 }

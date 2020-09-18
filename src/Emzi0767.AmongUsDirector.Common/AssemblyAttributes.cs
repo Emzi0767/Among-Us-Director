@@ -14,17 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Emzi0767.Utilities;
+using System.Runtime.CompilerServices;
 
-namespace Emzi0767.AmongUsDirector
-{
-    public sealed class GameStartAsyncEventArgs : AsyncEventArgs
-    {
-        public GameMap Map { get; }
-
-        internal GameStartAsyncEventArgs(GameStartEventArgs e)
-        {
-            this.Map = e.Map;
-        }
-    }
-}
+[assembly: InternalsVisibleTo("Emzi0767.AmongUsDirector.Wrapper")]
+[assembly: InternalsVisibleTo("Emzi0767.AmongUsDirector.Bot")]
+[assembly: InternalsVisibleTo("Emzi0767.AmongUsDirector.Probe")]

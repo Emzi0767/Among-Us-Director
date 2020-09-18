@@ -14,16 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Emzi0767.Utilities;
 
 namespace Emzi0767.AmongUsDirector
 {
     /// <summary>
-    /// Indicates the game has ended.
+    /// Wraps <see cref="MeetingStartEventArgs"/>.
     /// </summary>
-    public sealed class GameEndEventArgs : EventArgs
+    public sealed class MeetingStartAsyncEventArgs : AsyncEventArgs
     {
-        internal GameEndEventArgs()
+        /// <summary>
+        /// Creates a new instance of wrapper event args.
+        /// </summary>
+        /// <param name="e">Wrapped event's arguments.</param>
+        internal MeetingStartAsyncEventArgs(MeetingStartEventArgs e)
+        { }
+
+        /// <summary>
+        /// Creates a new instance of event args from data.
+        /// </summary>
+        internal MeetingStartAsyncEventArgs()
         { }
     }
 }

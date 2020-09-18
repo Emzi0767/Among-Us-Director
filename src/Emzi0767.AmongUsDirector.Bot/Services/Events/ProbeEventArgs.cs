@@ -14,19 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using Emzi0767.Utilities;
 
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class BotConfiguration
+    public sealed class ProbeEventArgs : AsyncEventArgs
     {
-        [Required]
-        public string Token { get; set; }
+        public ProbeEvent Event { get; }
 
-        [Required]
-        public string Prefix { get; set; }
-
-        [Required]
-        public int DiscoveryPort { get; set; }
+        internal ProbeEventArgs(ProbeEvent @event)
+        {
+            this.Event = @event;
+        }
     }
 }

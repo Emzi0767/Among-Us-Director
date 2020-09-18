@@ -14,19 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using MessagePack;
 
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class BotConfiguration
-    {
-        [Required]
-        public string Token { get; set; }
-
-        [Required]
-        public string Prefix { get; set; }
-
-        [Required]
-        public int DiscoveryPort { get; set; }
-    }
+    /// <summary>
+    /// Base type for all payload types.
+    /// </summary>
+    [Union(0, typeof(ProbeGameStartEventPayload))]
+    [Union(1, typeof(ProbeGameEndEventPayload))]
+    [Union(2, typeof(ProbeMeetingStartEventPayload))]
+    [Union(3, typeof(ProbeMeetingEndEventPayload))]
+    [Union(4, typeof(ProbePlayerEventPayload))]
+    public abstract class ProbeEventPayload
+    { }
 }

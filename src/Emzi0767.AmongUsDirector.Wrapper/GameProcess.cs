@@ -18,8 +18,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Emzi0767.Utilities;
 
 namespace Emzi0767.AmongUsDirector
 {

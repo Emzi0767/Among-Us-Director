@@ -27,15 +27,21 @@ namespace Emzi0767.AmongUsDirector
         private DiscordBotService DiscordBot { get; }
         private AmongUsGame Game { get; }
         private GameManagerService GameManager { get; }
+        private DiscoveryServer Discovery { get; }
+        private MothershipCommArray Comms { get; }
 
         public AmongUsDirectorHostedService(
             DiscordBotService discordBot,
             AmongUsGame game,
-            GameManagerService gameManager)
+            GameManagerService gameManager,
+            DiscoveryServer discovery,
+            MothershipCommArray comms)
         {
             this.DiscordBot = discordBot;
             this.Game = game;
             this.GameManager = gameManager;
+            this.Discovery = discovery;
+            this.Comms = comms;
 
             this.Game.GameStarted += this.Game_GameStarted;
             this.Game.GameEnded += this.Game_GameEnded;
@@ -49,13 +55,16 @@ namespace Emzi0767.AmongUsDirector
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await this.DiscordBot.StartAsync();
-            this.Game.Start();
+            this.Comms.Start();
+            this.Discovery.Start();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await this.DiscordBot.StopAsync();
+            await this.Discovery.StopAsync();
+            await this.Comms.StopAsync();
             this.Game.Stop();
+            await this.DiscordBot.StopAsync();
         }
 
         private async Task Game_GameStarted(AmongUsGame sender, GameStartAsyncEventArgs e)

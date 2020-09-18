@@ -18,23 +18,22 @@ using Emzi0767.Utilities;
 
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class PlayerAsyncEventArgs : AsyncEventArgs
+    /// <summary>
+    /// Wraps <see cref="GameEndEventArgs"/>.
+    /// </summary>
+    public sealed class GameEndAsyncEventArgs : AsyncEventArgs
     {
-        public Player Player { get; }
+        /// <summary>
+        /// Creates a new instance of wrapper event args.
+        /// </summary>
+        /// <param name="e">Wrapped event's arguments.</param>
+        internal GameEndAsyncEventArgs(GameEndEventArgs e)
+        { }
 
-        internal PlayerAsyncEventArgs(PlayerJoinEventArgs e)
-        {
-            this.Player = e.Player;
-        }
-
-        internal PlayerAsyncEventArgs(PlayerLeaveEventArgs e)
-        {
-            this.Player = e.Player;
-        }
-
-        internal PlayerAsyncEventArgs(PlayerDeathEventArgs e)
-        {
-            this.Player = e.Player;
-        }
+        /// <summary>
+        /// Creates a new instance of event args from data.
+        /// </summary>
+        internal GameEndAsyncEventArgs()
+        { }
     }
 }

@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Emzi0767.Utilities;
+using System.ComponentModel.DataAnnotations;
 
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class GameEndAsyncEventArgs : AsyncEventArgs
+    public sealed class ProbeConfiguration
     {
-        internal GameEndAsyncEventArgs(GameEndEventArgs ea)
-        { }
+        [Required]
+        public int DiscoveryPort { get; set; }
     }
 }

@@ -14,23 +14,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Emzi0767.Utilities;
 
 namespace Emzi0767.AmongUsDirector
 {
     /// <summary>
-    /// Indicates the game has started.
+    /// Wraps <see cref="GameStartEventArgs"/>.
     /// </summary>
-    public sealed class MeetingEndEventArgs : EventArgs
+    public sealed class GameStartAsyncEventArgs : AsyncEventArgs
     {
         /// <summary>
-        /// Gets the amount of seconds the exile screen lasts.
+        /// Gets the map on which the game happens.
         /// </summary>
-        public float ExileDuration { get; }
+        public GameMap Map { get; }
 
-        internal MeetingEndEventArgs(float exileTimer)
+        /// <summary>
+        /// Creates a new instance of wrapper event args.
+        /// </summary>
+        /// <param name="e">Wrapped event's arguments.</param>
+        internal GameStartAsyncEventArgs(GameStartEventArgs e)
         {
-            this.ExileDuration = exileTimer;
+            this.Map = e.Map;
+        }
+
+        /// <summary>
+        /// Creates a new instance of event args from data.
+        /// </summary>
+        /// <param name="map">Map on which the game happens.</param>
+        internal GameStartAsyncEventArgs(GameMap map)
+        {
+            this.Map = map;
         }
     }
 }

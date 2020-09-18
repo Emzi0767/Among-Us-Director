@@ -65,7 +65,7 @@ namespace Emzi0767.AmongUsDirector
 
         [Command("associate"), Aliases("assoc")]
         [Description("Associates a discord member with a player.")]
-        [RequirePermissions(Permissions.ManageRoles)]
+        [RequireUserPermissions(Permissions.ManageRoles)]
         public async Task AssociateAsync(CommandContext ctx,
             [Description("Discord user to associate.")] DiscordMember member,
             [Description("Player to associate with."), RemainingText] string playerName)
@@ -82,7 +82,7 @@ namespace Emzi0767.AmongUsDirector
 
         [Command("unassociate"), Aliases("unassoc", "disassociate", "disassoc")]
         [Description("Disassociates a discord member with a player.")]
-        [RequirePermissions(Permissions.ManageRoles)]
+        [RequireUserPermissions(Permissions.ManageRoles)]
         public async Task UnassociateAsync(CommandContext ctx,
             [Description("Discord user to disassociate.")] DiscordMember member,
             [Description("Player to disassociate with."), RemainingText] string playerName)
@@ -99,7 +99,7 @@ namespace Emzi0767.AmongUsDirector
 
         [Command("channel"), Aliases("chn", "vc")]
         [Description("Designates a voice channel for the game.")]
-        [RequirePermissions(Permissions.ManageChannels)]
+        [RequireUserPermissions(Permissions.ManageChannels)]
         public async Task SetVoiceChannelAsync(CommandContext ctx,
             [Description("Voice channel to use for the game."), RemainingText] DiscordChannel channel)
         {
@@ -116,7 +116,7 @@ namespace Emzi0767.AmongUsDirector
 
         [Command("output")]
         [Description("Designates a text channel to post minimal diagnostic information to.")]
-        [RequirePermissions(Permissions.ManageChannels)]
+        [RequireUserPermissions(Permissions.ManageChannels)]
         public async Task SetTextChannelAsync(CommandContext ctx,
             [Description("Text channel to send minimal diagnostic information to."), RemainingText] DiscordChannel channel = null)
         {

@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
 using Emzi0767.Utilities;
 using Microsoft.Extensions.Logging;
 
@@ -23,8 +22,9 @@ namespace Emzi0767.AmongUsDirector
 {
     public sealed class AmongUsGame
     {
+        private GameProcess Process { get; }
+        private AsyncExecutor Async { get; }
         private ILogger<AmongUsGame> Logger { get; }
-        private MothershipCommArray Comms { get; }
 
         private readonly AsyncEvent<AmongUsGame, GameStartAsyncEventArgs> _gameStarted;
         private readonly AsyncEvent<AmongUsGame, GameEndAsyncEventArgs> _gameEnded;
@@ -34,10 +34,10 @@ namespace Emzi0767.AmongUsDirector
         private readonly AsyncEvent<AmongUsGame, MeetingStartAsyncEventArgs> _meetingStarted;
         private readonly AsyncEvent<AmongUsGame, MeetingEndAsyncEventArgs> _meetingEnded;
 
-        public AmongUsGame(ILoggerFactory loggerFactory, MothershipCommArray comms)
+        public AmongUsGame(AsyncExecutor async, ILoggerFactory loggerFactory)
         {
+            this.Async = async;
             this.Logger = loggerFactory.CreateLogger<AmongUsGame>();
-            this.Comms = comms;
 
             this._gameStarted = new AsyncEvent<AmongUsGame, GameStartAsyncEventArgs>("AMONGUS_GAME_STARTED", TimeSpan.Zero, this.AsyncEventExceptionHandler);
             this._gameEnded = new AsyncEvent<AmongUsGame, GameEndAsyncEventArgs>("AMONGUS_GAME_ENDED", TimeSpan.Zero, this.AsyncEventExceptionHandler);
@@ -47,8 +47,21 @@ namespace Emzi0767.AmongUsDirector
             this._meetingStarted = new AsyncEvent<AmongUsGame, MeetingStartAsyncEventArgs>("AMONGUS_MEETING_STARTED", TimeSpan.Zero, this.AsyncEventExceptionHandler);
             this._meetingEnded = new AsyncEvent<AmongUsGame, MeetingEndAsyncEventArgs>("AMONGUS_MEETING_ENDED", TimeSpan.Zero, this.AsyncEventExceptionHandler);
 
-            this.Comms.ProbeEventReceived += this.Comms_ProbeEventReceived;
+            this.Process = GameProcess.Attach();
+
+            this.Process.GameStarted += this.Process_GameStarted;
+            this.Process.GameEnded += this.Process_GameEnded;
+
+            this.Process.PlayerJoined += this.Process_PlayerJoined;
+            this.Process.PlayerLeft += this.Process_PlayerLeft;
+            this.Process.PlayerDied += this.Process_PlayerDied;
+
+            this.Process.MeetingStarted += this.Process_MeetingStarted;
+            this.Process.MeetingEnded += this.Process_MeetingEnded;
         }
+
+        public void Start()
+            => this.Process.Start();
 
         public void Stop()
         {
@@ -59,6 +72,8 @@ namespace Emzi0767.AmongUsDirector
             this._playerDied.UnregisterAll();
             this._meetingStarted.UnregisterAll();
             this._meetingEnded.UnregisterAll();
+
+            this.Process.Dispose();
         }
 
         public event AsyncEventHandler<AmongUsGame, GameStartAsyncEventArgs> GameStarted
@@ -103,73 +118,50 @@ namespace Emzi0767.AmongUsDirector
             remove => this._meetingEnded.Unregister(value);
         }
 
-        private async Task Process_GameStarted(ProbeGameStartEventPayload e)
-        {
-            var args = e.ToEventArgs();
+        private void Process_GameStarted(object sender, GameStartEventArgs e)
+        { 
             this.Logger.LogInformation("Game started: map {0}", e.Map);
-            await this._gameStarted.InvokeAsync(this, args);
+            this.Async.Execute(this._gameStarted.InvokeAsync(this, new GameStartAsyncEventArgs(e)));
         }
 
-        private async Task Process_GameEnded(ProbeGameEndEventPayload e)
+        private void Process_GameEnded(object sender, GameEndEventArgs e)
         {
-            var args = e.ToEventArgs();
             this.Logger.LogInformation("Game ended");
-            await this._gameEnded.InvokeAsync(this, args);
+            this.Async.Execute(this._gameEnded.InvokeAsync(this, new GameEndAsyncEventArgs(e)));
         }
 
-        private async Task Process_PlayerJoined(ProbePlayerEventPayload e)
+        private void Process_PlayerJoined(object sender, PlayerJoinEventArgs e)
         {
-            var args = e.ToEventArgs();
-            this.Logger.LogInformation("Player joined: {0}", e.Name);
-            await this._playerJoined.InvokeAsync(this, args);
+            this.Logger.LogInformation("Player joined: {0}", e.Player.Name);
+            this.Async.Execute(this._playerJoined.InvokeAsync(this, new PlayerAsyncEventArgs(e)));
         }
 
-        private async Task Process_PlayerLeft(ProbePlayerEventPayload e)
+        private void Process_PlayerLeft(object sender, PlayerLeaveEventArgs e)
         {
-            var args = e.ToEventArgs();
-            this.Logger.LogInformation("Meeting left: {0}", e.Name);
-            await this._playerLeft.InvokeAsync(this, args);
+            this.Logger.LogInformation("Meeting left: {0}", e.Player.Name);
+            this.Async.Execute(this._playerLeft.InvokeAsync(this, new PlayerAsyncEventArgs(e)));
         }
 
-        private async Task Process_PlayerDied(ProbePlayerEventPayload e)
+        private void Process_PlayerDied(object sender, PlayerDeathEventArgs e)
         {
-            var args = e.ToEventArgs();
-            this.Logger.LogDebug("Player died: {0}", e.Name);
-            await this._playerDied.InvokeAsync(this, args);
+            this.Logger.LogDebug("Player died: {0}", e.Player.Name);
+            this.Async.Execute(this._playerDied.InvokeAsync(this, new PlayerAsyncEventArgs(e)));
         }
 
-        private async Task Process_MeetingStarted(ProbeMeetingStartEventPayload e)
+        private void Process_MeetingStarted(object sender, MeetingStartEventArgs e)
         {
-            var args = e.ToEventArgs();
             this.Logger.LogInformation("Meeting started");
-            await this._meetingStarted.InvokeAsync(this, args);
+            this.Async.Execute(this._meetingStarted.InvokeAsync(this, new MeetingStartAsyncEventArgs(e)));
         }
 
-        private async Task Process_MeetingEnded(ProbeMeetingEndEventPayload e)
+        private void Process_MeetingEnded(object sender, MeetingEndEventArgs e)
         {
-            var args = e.ToEventArgs();
             this.Logger.LogInformation("Meeting ended: exile after {0:0.0}s", e.ExileDuration);
-            await this._meetingEnded.InvokeAsync(this, args);
+            this.Async.Execute(this._meetingEnded.InvokeAsync(this, new MeetingEndAsyncEventArgs(e)));
         }
 
         private void AsyncEventExceptionHandler<TArgs>(AsyncEvent<AmongUsGame, TArgs> asyncEvent, Exception exception, AsyncEventHandler<AmongUsGame, TArgs> handler, AmongUsGame sender, TArgs eventArgs)
             where TArgs : AsyncEventArgs
             => this.Logger.LogError(exception, "An exception occured while handling {0} game event.", asyncEvent.Name);
-
-        private async Task Comms_ProbeEventReceived(MothershipCommArray sender, ProbeEventArgs e)
-        {
-            await (e.Event.EventType switch
-            {
-                ProbeEventType.GameStart => this.Process_GameStarted(e.Event.Payload as ProbeGameStartEventPayload),
-                ProbeEventType.GameEnd => this.Process_GameEnded(e.Event.Payload as ProbeGameEndEventPayload),
-                ProbeEventType.PlayerJoin => this.Process_PlayerJoined(e.Event.Payload as ProbePlayerEventPayload),
-                ProbeEventType.PlayerLeave => this.Process_PlayerLeft(e.Event.Payload as ProbePlayerEventPayload),
-                ProbeEventType.PlayerDeath => this.Process_PlayerDied(e.Event.Payload as ProbePlayerEventPayload),
-                ProbeEventType.MeetingStart => this.Process_MeetingStarted(e.Event.Payload as ProbeMeetingStartEventPayload),
-                ProbeEventType.MeetingEnd => this.Process_MeetingEnded(e.Event.Payload as ProbeMeetingEndEventPayload),
-
-                _ => Task.CompletedTask
-            });
-        }
     }
 }

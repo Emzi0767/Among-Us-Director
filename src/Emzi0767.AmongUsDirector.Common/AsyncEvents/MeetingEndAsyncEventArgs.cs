@@ -18,13 +18,32 @@ using Emzi0767.Utilities;
 
 namespace Emzi0767.AmongUsDirector
 {
+    /// <summary>
+    /// Wraps <see cref="MeetingEndEventArgs>"/>.
+    /// </summary>
     public sealed class MeetingEndAsyncEventArgs : AsyncEventArgs
     {
+        /// <summary>
+        /// Gets the number of seconds the exile screen lasts.
+        /// </summary>
         public float ExileDuration { get; }
 
+        /// <summary>
+        /// Creates a new instance of wrapper event args.
+        /// </summary>
+        /// <param name="e">Wrapped event's arguments.</param>
         internal MeetingEndAsyncEventArgs(MeetingEndEventArgs e)
         {
             this.ExileDuration = e.ExileDuration;
+        }
+
+        /// <summary>
+        /// Creates a new instance of event args from data.
+        /// </summary>
+        /// <param name="exileDuration">Duration of exile screen.</param>
+        internal MeetingEndAsyncEventArgs(float exileDuration)
+        {
+            this.ExileDuration = exileDuration;
         }
     }
 }

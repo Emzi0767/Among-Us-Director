@@ -14,13 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Emzi0767.Utilities;
+using System;
 
 namespace Emzi0767.AmongUsDirector
 {
-    public sealed class MeetingStartAsyncEventArgs : AsyncEventArgs
+    /// <summary>
+    /// Indicates the game has ended.
+    /// </summary>
+    public sealed class GameEndEventArgs : EventArgs
     {
-        internal MeetingStartAsyncEventArgs(MeetingStartEventArgs e)
+        /// <summary>
+        /// Creates a new instance of the event args.
+        /// </summary>
+        internal GameEndEventArgs()
         { }
     }
 }

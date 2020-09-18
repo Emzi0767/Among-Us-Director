@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!-- 
 
   This file is part of Among Us Director project.
@@ -22,12 +22,27 @@
 
   <Import Project="../Emzi0767.AmongUsDirector.Common.targets" />
 
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Emzi0767.Common" Version="2.2.0" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00722" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00722" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="3.1.8" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../Emzi0767.AmongUsDirector.Wrapper/Emzi0767.AmongUsDirector.Wrapper.csproj" />
     <ProjectReference Include="../Emzi0767.AmongUsDirector.Common/Emzi0767.AmongUsDirector.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

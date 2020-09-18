@@ -14,6 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
+using System;
 
-[assembly: InternalsVisibleTo("Emzi0767.AmongUsDirector.TestApp")]
+namespace Emzi0767.AmongUsDirector
+{
+    /// <summary>
+    /// Indicates a player has died.
+    /// </summary>
+    public sealed class PlayerDeathEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the player who died.
+        /// </summary>
+        public Player Player { get; }
+
+        /// <summary>
+        /// Creates a new instance of the event args.
+        /// </summary>
+        /// <param name="player">Player who died.</param>
+        internal PlayerDeathEventArgs(Player player)
+        {
+            this.Player = player;
+        }
+    }
+}

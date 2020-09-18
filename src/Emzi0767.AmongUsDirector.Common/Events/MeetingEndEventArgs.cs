@@ -19,18 +19,22 @@ using System;
 namespace Emzi0767.AmongUsDirector
 {
     /// <summary>
-    /// Indicates a player has died.
+    /// Indicates the game has started.
     /// </summary>
-    public sealed class PlayerDeathEventArgs : EventArgs
+    public sealed class MeetingEndEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets the player who died.
+        /// Gets the amount of seconds the exile screen lasts.
         /// </summary>
-        public Player Player { get; }
+        public float ExileDuration { get; }
 
-        internal PlayerDeathEventArgs(Player player)
+        /// <summary>
+        /// Creates a new instance of the event args.
+        /// </summary>
+        /// <param name="exileTimer">Number of seconds the exile screen lasts.</param>
+        internal MeetingEndEventArgs(float exileTimer)
         {
-            this.Player = player;
+            this.ExileDuration = exileTimer;
         }
     }
 }

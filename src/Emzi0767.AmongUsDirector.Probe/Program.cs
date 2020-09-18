@@ -16,6 +16,7 @@
 
 using System;
 using Emzi0767.AmongUsDirector.Services;
+using Emzi0767.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,18 +47,18 @@ namespace Emzi0767.AmongUsDirector
 
         public static void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
         {
-            services.AddOptions<BotConfiguration>()
+            services.AddOptions<ProbeConfiguration>()
                 .Bind(ctx.Configuration)
                 .ValidateDataAnnotations();
 
-            services.AddSingleton<DiscordBotService>();
+            services.AddSingleton<DiscoveryClient>();
             services.AddSingleton<AmongUsGame>();
-            services.AddSingleton<GameManagerService>();
-            services.AddSingleton<DiscoveryServer>();
-            services.AddSingleton<MothershipCommArray>();
+            services.AddSingleton<ProbeCommArray>();
             services.AddTransient<PayloadSerializer>();
 
-            services.AddHostedService<AmongUsDirectorHostedService>();
+            services.AddTransient<AsyncExecutor>();
+
+            services.AddHostedService<ProbeHostedService>();
         }
 
         public static void ConfigureLogging(ILoggingBuilder logging)

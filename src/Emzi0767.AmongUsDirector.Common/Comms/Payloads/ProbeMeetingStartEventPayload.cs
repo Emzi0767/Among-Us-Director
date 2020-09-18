@@ -14,23 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MessagePack;
 
 namespace Emzi0767.AmongUsDirector
 {
     /// <summary>
-    /// Indicates the game has started.
+    /// Contains arguments for game start event.
     /// </summary>
-    public sealed class GameStartEventArgs : EventArgs
+    [MessagePackObject]
+    public sealed class ProbeMeetingStartEventPayload : ProbeEventPayload
     {
         /// <summary>
-        /// Gets the map being played.
+        /// Creates event args from this payload.
         /// </summary>
-        public GameMap Map { get; }
+        /// <returns>Constructed event args.</returns>
+        public MeetingStartAsyncEventArgs ToEventArgs()
+            => new MeetingStartAsyncEventArgs();
 
-        internal GameStartEventArgs(GameMap map)
-        {
-            this.Map = map;
-        }
+        /// <summary>
+        /// Creates a payload from event args.
+        /// </summary>
+        /// <param name="e">Event args to construct from.</param>
+        /// <returns>Constructed event payload.</returns>
+        public static ProbeMeetingStartEventPayload FromEventArgs(MeetingStartAsyncEventArgs e)
+            => new ProbeMeetingStartEventPayload();
     }
 }

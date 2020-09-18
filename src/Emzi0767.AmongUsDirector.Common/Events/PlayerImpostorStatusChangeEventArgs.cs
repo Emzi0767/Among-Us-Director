@@ -28,6 +28,10 @@ namespace Emzi0767.AmongUsDirector
         /// </summary>
         public Player Player { get; }
 
+        /// <summary>
+        /// Creates a new instance of the event args.
+        /// </summary>
+        /// <param name="player">Player whose impostor status changed.</param>
         internal PlayerImpostorStatusChangeEventArgs(Player player)
         {
             this.Player = player;

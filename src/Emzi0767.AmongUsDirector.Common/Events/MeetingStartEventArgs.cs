@@ -19,18 +19,14 @@ using System;
 namespace Emzi0767.AmongUsDirector
 {
     /// <summary>
-    /// Indicates a player has joined.
+    /// Indicates the game has started.
     /// </summary>
-    public sealed class PlayerJoinEventArgs : EventArgs
+    public sealed class MeetingStartEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets the player who joined.
+        /// Creates a new instance of the event args.
         /// </summary>
-        public Player Player { get; }
-
-        internal PlayerJoinEventArgs(Player player)
-        {
-            this.Player = player;
-        }
+        internal MeetingStartEventArgs()
+        { }
     }
 }
