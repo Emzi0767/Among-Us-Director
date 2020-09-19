@@ -15,7 +15,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace Emzi0767.AmongUsDirector
@@ -23,7 +26,7 @@ namespace Emzi0767.AmongUsDirector
     /// <summary>
     /// Wraps the memory of a foreign process.
     /// </summary>
-    public sealed class ProcessMemory
+    internal sealed class ProcessMemory
     {
         private readonly Process _proc;
 
@@ -117,6 +120,113 @@ namespace Emzi0767.AmongUsDirector
             return Encoding.ASCII.GetString(spbuff);
         }
 
+        public unsafe int FindPattern(byte?[] pattern, ReadOnlySpan<byte> buffer)
+        {
+            if (pattern == null || pattern.Length == 0)
+                return 0;
+
+            // split into subpatterns
+            var subpatterns = new List<Subpattern>(4);
+            var lastNull = false;
+            var start = 0;
+            for (var i = 0; i < pattern.Length; i++)
+            {
+                if (pattern[i] == null && !lastNull)
+                {
+                    var subpattern = new byte[i - start];
+                    for (var j = 0; j < subpattern.Length; j++)
+                        subpattern[j] = pattern[j + start].Value;
+
+                    subpatterns.Add(new Subpattern { Gap = -1, Pattern = subpattern });
+
+                    start = i;
+                    lastNull = true;
+                }
+                else if (pattern[i] != null && lastNull)
+                {
+                    subpatterns.Add(new Subpattern { Gap = i - start });
+
+                    start = i;
+                    lastNull = false;
+                }
+            }
+
+            var sub = new Subpattern
+            {
+                Gap = lastNull ? pattern.Length - start : -1,
+                Pattern = lastNull ? null : new byte[pattern.Length - start]
+            };
+            subpatterns.Add(sub);
+            for (var j = 0; j < sub.Pattern.Length; j++)
+                sub.Pattern[j] = pattern[j + start].Value;
+
+            if (subpatterns[0].Gap != -1) // not be doing dis anyways
+                return 0;
+
+            // scan for first subpattern
+            var pos = 0;
+            while (pos < buffer.Length - pattern.Length)
+            {
+                var buff = buffer.Slice(pos);
+
+                var subi = 0;
+                var subpattern = subpatterns[subi];
+
+                var fpos = buff.IndexOf(subpattern.Pattern);
+                if (fpos == -1)
+                    break;
+
+                // scan for next subpatterns
+                var spos = pos + fpos;
+                pos += fpos + subpattern.Pattern.Length;
+                for (++subi; subi < subpatterns.Count; subi++)
+                {
+                    subpattern = subpatterns[subi];
+                    if (subpattern.Gap > 0)
+                    {
+                        pos += subpattern.Gap;
+                        continue;
+                    }
+
+                    buff = buffer.Slice(pos);
+                    if (!buff.Slice(0, subpattern.Pattern.Length).SequenceEqual(subpattern.Pattern))
+                        break;
+
+                    pos += subpattern.Pattern.Length;
+                }
+
+                // did we find all?
+                if (subi == subpatterns.Count)
+                    return spos;
+            }
+
+            return 0;
+        }
+
+        public unsafe IEnumerable<NamedOffset> FindOffsets(NamedPattern[] patterns, IntPtrEx @base, int size)
+        {
+            var buff = new byte[size];
+            fixed (byte* ptr = buff)
+                if (!this.TryReadRawMemory(@base, ptr, size, out var read) || read != size)
+                    return null;
+
+            var baseval = @base.Pointer.ToInt32();
+            var offsets = new NamedOffset[patterns.Length];
+            for (var i = 0; i < patterns.Length; i++)
+            {
+                var pattern = patterns[i];
+                var off = this.FindPattern(pattern.Pattern, buff);
+
+                var ptr = 0;
+                if (!this.TryReadRawMemory(@base + off + pattern.PointerStart, &ptr, sizeof(int), out var read) || read != sizeof(int))
+                    throw new InvalidProcessException();
+
+                offsets[i] = new NamedOffset(ptr - baseval, pattern.Name);
+            }    
+
+            return offsets;
+        }
+
         private unsafe bool TryReadRawMemory(IntPtrEx addr, void* buff, int size, out int read)
         {
             read = -1;
@@ -125,6 +235,12 @@ namespace Emzi0767.AmongUsDirector
 
             read = pread.ToInt32();
             return true;
+        }
+
+        public struct Subpattern
+        {
+            public int Gap { get; set; }
+            public byte[] Pattern { get; set; }
         }
     }
 }

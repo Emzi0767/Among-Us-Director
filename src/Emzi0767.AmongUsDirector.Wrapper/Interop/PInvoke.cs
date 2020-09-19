@@ -30,6 +30,9 @@ namespace Emzi0767.AmongUsDirector
         [DllImport("psapi.dll", EntryPoint = "GetModuleBaseNameW", CharSet = CharSet.Unicode, SetLastError = true)]
         public static unsafe extern uint GetModuleBaseName(IntPtr hProcess, IntPtr hModule, char* lpBaseName, uint nSize);
 
+        [DllImport("psapi.dll", EntryPoint = "GetModuleInformation", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static unsafe extern bool GetModuleInformation(IntPtr hProcess, IntPtr hModule, void* lpmodinfo, int size);
+
         [DllImport("kernel32.dll", SetLastError = true)]
         public static unsafe extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, void* lpBuffer, IntPtr dwSize, out IntPtr lpNumberOfBytesRead);
     }

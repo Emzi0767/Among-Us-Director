@@ -25,16 +25,28 @@ namespace Emzi0767.AmongUsDirector
         public const int StringFirst = 0x0C;
 
         public const string ClientName = "AmongUsClient";
-        public const int ClientBase = 0xDA5ACC;
+        public static byte?[] ClientPattern { get; } = new byte?[] { 0xC7, 0x46, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xA1, null, null, null, null, 0x8B, 0x40, 0x5C, 0x8B, 0x30 };
+        public const int ClientPatternPtrLocation = 8;
+        //public const int ClientBase = 0xDA5ACC;
+        public static int ClientBase { get; set; } = 0;
 
         public const string MeetingHudName = "MeetingHud";
-        public const int MeetingHudBase = 0xDA58D0;
+        public static byte?[] MeetingHudPattern { get; } = new byte?[] { 0xC7, 0x43, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xA1, null, null, null, null, 0x8B, 0x40, 0x5C, 0x8B, 0x30 };
+        public const int MeetingHudPatternPtrLocation = 8;
+        //public const int MeetingHudBase = 0xDA58D0;
+        public static int MeetingHudBase { get; set; } = 0;
 
         public const string GameDataName = "GameData";
-        public const int GameDataBase = 0xDA5A60;
+        public static byte?[] GameDataPattern { get; } = new byte?[] { 0xC7, 0x47, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xA1, null, null, null, null, 0x53, 0x8B, 0x40, 0x5C };
+        public const int GameDataPatternPtrLocation = 8;
+        //public const int GameDataBase = 0xDA5A60;
+        public static int GameDataBase { get; set; } = 0;
 
         public const string ShipStatusName = "ShipStatus";
-        public const int ShipStatusBase = 0xDA5A50;
+        public static byte?[] ShipStatusPattern { get; } = new byte?[] { 0x89, 0x43, 0x08, 0xA1, null, null, null, null, 0x46, 0x83, 0xC7, 0x04 };
+        public const int ShipStatusPatternPtrLocation = 4;
+        //public const int ShipStatusBase = 0xDA5A50;
+        public static int ShipStatusBase { get; set; } = 0;
 
         public const string ExileControllerName = "ExileController";
         public const string MiraExileControllerName = "MiraExileController";

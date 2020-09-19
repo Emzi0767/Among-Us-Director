@@ -31,15 +31,17 @@ namespace Emzi0767.AmongUsDirector
 
         private readonly Process _proc;
         private readonly IntPtrEx _module;
+        private readonly int _moduleSize;
 
         private readonly CancellationTokenSource _cts;
         private readonly CancellationToken _ct;
         private Thread _eventDispatcherThread;
 
-        private GameProcess(Process p, IntPtrEx gameModule)
+        private GameProcess(Process p, IntPtrEx gameModule, int moduleSize)
         {
             this._proc = p;
             this._module = gameModule;
+            this._moduleSize = moduleSize;
             this._cts = new CancellationTokenSource();
             this._ct = this._cts.Token;
 
@@ -153,7 +155,7 @@ namespace Emzi0767.AmongUsDirector
         private void EventDispatcherLoop()
         {
             var mem = new ProcessMemory(this._proc);
-            var reader = new GameReader(mem, this._module);
+            var reader = new GameReader(mem, this._module, this._moduleSize);
             reader.GameStarted += (o, e) => this.TriggerEvent(o, e);
             reader.GameEnded += (o, e) => this.TriggerEvent(o, e);
             reader.PlayerJoined += (o, e) => this.TriggerEvent(o, e);
@@ -217,7 +219,11 @@ namespace Emzi0767.AmongUsDirector
             if (module == IntPtr.Zero)
                 throw new InvalidProcessException();
 
-            return new GameProcess(proc, module);
+            var modInfo = default(ModuleInfo);
+            if (!PInvoke.GetModuleInformation(proc.Handle, module, &modInfo, sizeof(ModuleInfo)))
+                throw new InvalidProcessException();
+
+            return new GameProcess(proc, module, modInfo.SizeOfImage);
         }
     }
 }

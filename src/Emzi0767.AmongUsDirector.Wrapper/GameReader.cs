@@ -25,14 +25,49 @@ namespace Emzi0767.AmongUsDirector
     {
         private readonly ProcessMemory _mem;
         private readonly IntPtrEx _module;
+        private readonly int _moduleSize;
 
         private GameStateInfo _state;
 
-        public GameReader(ProcessMemory pmem, IntPtrEx module)
+        public GameReader(ProcessMemory pmem, IntPtrEx module, int moduleSize)
         {
             this._mem = pmem;
             this._module = module;
+            this._moduleSize = moduleSize;
             this._state = new GameStateInfo();
+
+            var offsets = this._mem.FindOffsets(new NamedPattern[]
+            {
+                new NamedPattern(Offsets.ClientName, Offsets.ClientPattern, Offsets.ClientPatternPtrLocation),
+                new NamedPattern(Offsets.MeetingHudName, Offsets.MeetingHudPattern, Offsets.MeetingHudPatternPtrLocation),
+                new NamedPattern(Offsets.GameDataName, Offsets.GameDataPattern, Offsets.GameDataPatternPtrLocation),
+                new NamedPattern(Offsets.ShipStatusName, Offsets.ShipStatusPattern, Offsets.ShipStatusPatternPtrLocation)
+            }, this._module, this._moduleSize);
+
+            foreach (var offset in offsets)
+            {
+                switch (offset.Name)
+                {
+                    case Offsets.ClientName:
+                        Offsets.ClientBase = offset.Offset;
+                        break;
+
+                    case Offsets.MeetingHudName:
+                        Offsets.MeetingHudBase = offset.Offset;
+                        break;
+
+                    case Offsets.GameDataName:
+                        Offsets.GameDataBase = offset.Offset;
+                        break;
+
+                    case Offsets.ShipStatusName:
+                        Offsets.ShipStatusBase = offset.Offset;
+                        break;
+                }
+            }
+
+            if (Offsets.ClientBase == 0 || Offsets.MeetingHudBase == 0 || Offsets.GameDataBase == 0 || Offsets.ShipStatusBase == 0)
+                throw new InvalidProcessException();
         }
 
         public void DoRead()
