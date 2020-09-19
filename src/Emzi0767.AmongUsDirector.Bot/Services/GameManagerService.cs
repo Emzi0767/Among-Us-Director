@@ -116,6 +116,7 @@ namespace Emzi0767.AmongUsDirector
         public void AddPlayer(string player)
         {
             this.AllPlayers.Add(player);
+            this.DeadPlayers.Remove(player);
         }
 
         public void RemovePlayer(string player)
