@@ -75,6 +75,7 @@ namespace Emzi0767.AmongUsDirector
 
         private async Task Game_GameStarted(AmongUsGame sender, GameStartAsyncEventArgs e)
         {
+            this.GameManager.ResetDeaths();
             if (this.GameManager.VoiceChannel != 0ul)
                 await this.DiscordBot.MuteAllAsync(this.GameManager.VoiceChannel);
 
@@ -132,8 +133,8 @@ namespace Emzi0767.AmongUsDirector
                 var unmute = this.GameManager.GetUnmutables();
                 var undeaf = this.GameManager.GetUndeafables();
 
-                await this.DiscordBot.UnmuteAsync(this.GameManager.Guild, unmute);
                 await this.DiscordBot.UndeafenAsync(this.GameManager.Guild, undeaf);
+                await this.DiscordBot.UnmuteAsync(this.GameManager.Guild, unmute);
             }
 
             var chn = this.GameManager.TextChannel;

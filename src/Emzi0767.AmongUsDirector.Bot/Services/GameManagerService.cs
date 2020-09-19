@@ -113,6 +113,9 @@ namespace Emzi0767.AmongUsDirector
             return true;
         }
 
+        public void ResetDeaths()
+            => this.DeadPlayers.Clear();
+
         public void AddPlayer(string player)
         {
             this.AllPlayers.Add(player);
