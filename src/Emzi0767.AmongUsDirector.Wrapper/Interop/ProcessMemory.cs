@@ -19,6 +19,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Emzi0767.AmongUsDirector
@@ -223,6 +225,60 @@ namespace Emzi0767.AmongUsDirector
 
                 offsets[i] = new NamedOffset(ptr - baseval, pattern.Name);
             }    
+
+            return offsets;
+        }
+
+        public unsafe IEnumerable<NamedOffset> FindClasses(IntPtrEx @base, int size, params string[] classNames)
+        {
+            var dos = default(PeDosHeader);
+            if (!this.TryReadRawMemory(@base, &dos, sizeof(PeDosHeader), out var read) || read != sizeof(PeDosHeader))
+                return null;
+
+            var ntOffset = @base + dos.e_lfanew;
+            var nt = default(PeNtHeader);
+            if (!this.TryReadRawMemory(ntOffset, &nt, sizeof(PeNtHeader), out read) || read != sizeof(PeNtHeader))
+                return null;
+
+            var sectionOffset = ntOffset + sizeof(PeNtHeader);
+            var section = default(PeImageSectionHeader);
+            for (var i = 0; i < nt.FileHeader.NumberOfSections; i++)
+            {
+                if (!this.TryReadRawMemory(sectionOffset + i * sizeof(PeImageSectionHeader), &section, sizeof(PeImageSectionHeader), out read) || read != sizeof(PeImageSectionHeader))
+                    continue;
+
+                if (new Span<byte>(section.Name, PeImageSectionHeader.IMAGE_SIZEOF_SHORT_NAME).SequenceEqual(Offsets.PeDataSectionName))
+                    break;
+            }
+
+            var names = new HashSet<string>(classNames);
+            var offsets = new List<NamedOffset>(classNames.Length);
+
+            var buff = new byte[section.VirtualSize];
+            fixed (byte* ptr = buff)
+                if (!this.TryReadRawMemory(@base + section.VirtualAddress, ptr, buff.Length, out read) || read != buff.Length)
+                    return null;
+
+            var ptrs = MemoryMarshal.Cast<byte, int>(buff.AsSpan());
+            var bval = @base.Pointer.ToInt32();
+            var classDesc = default(RawClassInfo);
+            var xptr = new IntPtrEx(IntPtr.Zero);
+            for (var i = ptrs.Length - 1; i >= 0 && names.Count > 0; --i)
+            {
+                xptr = new IntPtr(ptrs[i]);
+                if (!this.TryReadRawMemory(xptr, &classDesc, sizeof(RawClassInfo), out read) || read != sizeof(RawClassInfo))
+                    continue;
+
+                if (classDesc.Klass != xptr)
+                    continue;
+
+                var name = this.ReadAnsiString(classDesc.Name, 64);
+                if (names.Contains(name))
+                {
+                    offsets.Add(new NamedOffset(section.VirtualAddress + i * IntPtr.Size, name));
+                    names.Remove(name);
+                }
+            }
 
             return offsets;
         }

@@ -14,18 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace Emzi0767.AmongUsDirector
 {
     [StructLayout(LayoutKind.Explicit)]
-    internal unsafe struct RawClassInfo
+    internal struct PeNtHeader
     {
-        [FieldOffset(0x08)]
-        public IntPtr Name;
+        // PE..  50 45 00 00
+        [FieldOffset(0x00)]
+        public int Signature;
 
-        [FieldOffset(0x3C)]
-        public IntPtr Klass;
-    }
+        [FieldOffset(0x04)]
+        public PeNtFileHeader FileHeader;
+
+        [FieldOffset(0x18 /* 0x04 + 0x14 - latter is sizeof(PeNtFileHeader) */)]
+        public PeNtOptionalHeader OptionalHeader;
+    } // size: 0x0210 = 0x04 + 0x14 + 0xE0
 }

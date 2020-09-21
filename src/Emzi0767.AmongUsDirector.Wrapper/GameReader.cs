@@ -36,13 +36,7 @@ namespace Emzi0767.AmongUsDirector
             this._moduleSize = moduleSize;
             this._state = new GameStateInfo();
 
-            var offsets = this._mem.FindOffsets(new NamedPattern[]
-            {
-                new NamedPattern(Offsets.ClientName, Offsets.ClientPattern, Offsets.ClientPatternPtrLocation),
-                new NamedPattern(Offsets.MeetingHudName, Offsets.MeetingHudPattern, Offsets.MeetingHudPatternPtrLocation),
-                new NamedPattern(Offsets.GameDataName, Offsets.GameDataPattern, Offsets.GameDataPatternPtrLocation),
-                new NamedPattern(Offsets.ShipStatusName, Offsets.ShipStatusPattern, Offsets.ShipStatusPatternPtrLocation)
-            }, this._module, this._moduleSize);
+            var offsets = this._mem.FindClasses(this._module, this._moduleSize, Offsets.ClientName, Offsets.MeetingHudName, Offsets.GameDataName, Offsets.ShipStatusName);
 
             foreach (var offset in offsets)
             {

@@ -14,18 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace Emzi0767.AmongUsDirector
 {
     [StructLayout(LayoutKind.Explicit)]
-    internal unsafe struct RawClassInfo
+    internal struct PeImageDataDirectory
     {
-        [FieldOffset(0x08)]
-        public IntPtr Name;
+        [FieldOffset(0x00)]
+        public int VirtualAddress;
 
-        [FieldOffset(0x3C)]
-        public IntPtr Klass;
+        [FieldOffset(0x04)]
+        public int Size;
     }
 }

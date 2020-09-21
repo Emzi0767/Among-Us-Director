@@ -32,7 +32,7 @@
   <!-- Project info -->
   <PropertyGroup>
     <RootNamespace>Emzi0767.AmongUsDirector</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <FileVersion>$(Version).0</FileVersion>
   </PropertyGroup>
