@@ -26,8 +26,7 @@ namespace Emzi0767.AmongUsDirector
         private readonly ProcessMemory _mem;
         private readonly IntPtrEx _module;
         private readonly int _moduleSize;
-
-        private GameStateInfo _state;
+        private readonly GameStateInfo _state;
 
         public GameReader(ProcessMemory pmem, IntPtrEx module, int moduleSize)
         {
