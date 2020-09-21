@@ -99,6 +99,9 @@ namespace Emzi0767.AmongUsDirector
                 return;
 
             var players = this.ReadPlayers();
+            if (players == null)
+                return;
+
             foreach (var player in players)
             {
                 if (!this._state.Players.Contains(player))
@@ -149,13 +152,16 @@ namespace Emzi0767.AmongUsDirector
             }
 
             var inMeeting = this.ReadMeetingStatus();
+            if (inMeeting == null)
+                return;
+
             if (this._state.IsInMeeting != inMeeting)
             {
-                this._state.IsInMeeting = inMeeting;
+                this._state.IsInMeeting = inMeeting.Value;
 
-                if (inMeeting && this.MeetingStarted != null)
+                if (inMeeting.Value && this.MeetingStarted != null)
                     this.MeetingStarted(null, new MeetingStartEventArgs());
-                else if (!inMeeting && this.MeetingEnded != null)
+                else if (!inMeeting.Value && this.MeetingEnded != null)
                     this.MeetingEnded(null, new MeetingEndEventArgs(timer + 3.5F));
             }
         }
@@ -175,7 +181,8 @@ namespace Emzi0767.AmongUsDirector
         {
             var clientPtr = this._mem.ReadPointerChain(this._module, Offsets.ClientBase, Offsets.Il2CppStaticsOffset, Offsets.None);
             client = this._mem.Read<RawClient>(clientPtr);
-            this.ValidateKlass(client.Klass, Offsets.ClientName);
+            if (!this.TryValidateKlass(client.Klass, Offsets.ClientName))
+                return false;
 
             return client.GameMode == GameMode.FreePlay && client.GameState == GameState.Joined
                 || client.GameMode != GameMode.FreePlay && client.GameState == GameState.Started;
@@ -185,7 +192,8 @@ namespace Emzi0767.AmongUsDirector
         {
             var gameDataPtr = this._mem.ReadPointerChain(this._module, Offsets.GameDataBase, Offsets.Il2CppStaticsOffset, Offsets.None);
             var gameData = this._mem.Read<RawGameData>(gameDataPtr);
-            this.ValidateKlass(gameData.Klass, Offsets.GameDataName);
+            if (!this.TryValidateKlass(gameData.Klass, Offsets.GameDataName))
+                return null;
 
             var playerList = this._mem.Read<RawList>(gameData.AllPlayers);
             var playerCount = playerList.Size;
@@ -210,18 +218,19 @@ namespace Emzi0767.AmongUsDirector
             return players;
         }
 
-        private bool ReadMeetingStatus()
+        private bool? ReadMeetingStatus()
         {
             var meetingHudPtr = this._mem.ReadPointer(this._module + Offsets.MeetingHudBase);
             if (meetingHudPtr == IntPtr.Zero)
-                return false;
+                return null;
 
             meetingHudPtr = this._mem.ReadPointerChain(meetingHudPtr, Offsets.Il2CppStaticsOffset, Offsets.None);
             if (meetingHudPtr == IntPtr.Zero)
-                return false;
+                return null;
 
             var meetingHud = this._mem.Read<RawMeetingHud>(meetingHudPtr);
-            this.ValidateKlass(meetingHud.Klass, Offsets.MeetingHudName);
+            if (!this.TryValidateKlass(meetingHud.Klass, Offsets.MeetingHudName))
+                return null;
 
             return meetingHud.MeetingState != MeetingState.Proceeding;
         }
@@ -240,20 +249,22 @@ namespace Emzi0767.AmongUsDirector
                 return (timer, map);
 
             var shipStatus = this._mem.Read<RawShipStatus>(shipStatusPtr);
-            this.ValidateKlass(shipStatus.Klass, Offsets.ShipStatusName);
+            if (!this.TryValidateKlass(shipStatus.Klass, Offsets.ShipStatusName))
+                return (timer, map);
 
             map = (GameMap)shipStatus.MapType;
             if (shipStatus.ExileController == IntPtr.Zero)
                 return (timer, map);
 
             var exileController = this._mem.Read<RawExileController>(shipStatus.ExileController);
-            this.ValidateKlass(exileController.Klass, Offsets.ExileControllerName, Offsets.MiraExileControllerName, Offsets.PollusExileControllerName);
+            if (!this.TryValidateKlass(exileController.Klass, Offsets.ExileControllerName, Offsets.MiraExileControllerName, Offsets.PollusExileControllerName))
+                return (timer, map);
 
             timer = exileController.Duration;
             return (timer, map);
         }
 
-        private void ValidateKlass(IntPtrEx klassPtr, params string[] refNames)
+        private bool TryValidateKlass(IntPtrEx klassPtr, params string[] refNames)
         {
             // For whatever bloody reason, the pointers are off by one sometimes.
             // Always case with LSB
@@ -263,8 +274,7 @@ namespace Emzi0767.AmongUsDirector
 
             var klass = this._mem.Read<RawClassInfo>(new IntPtr(ptrv));
             var name = this._mem.ReadAnsiString(klass.Name);
-            if (!refNames.Any(x => name == x))
-                throw new InvalidProcessException();
+            return refNames.Any(x => name == x);
         }
     }
 }
